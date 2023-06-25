@@ -6,16 +6,14 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.Objects;
 import java.util.Random;
 
 public final class SlimeInABukkitPlugin extends JavaPlugin {
+    public static final String SLIME_INTERACT_PERMISSION = "slimeinabukkit.interact";
 
     public static final String CHUNK_STATUS_PLACEHOLDER = "%chunk-status%";
     static final String DEFAULT_BUCKET_TITLE = "§rSlime in a bucket";
@@ -23,7 +21,6 @@ public final class SlimeInABukkitPlugin extends JavaPlugin {
     static final String DEFAULT_CHUNK_STATUS_TRUE = "§ais";
     static final String DEFAULT_CHUNK_STATUS_FALSE = "§cis not";
     static final boolean DEFAULT_CAN_PICKUP_SLIME = true;
-    private final boolean isTest;
     private @NotNull String slimeChunkMessage = "";
 
     private static final int PLUGIN_ID = 14716;
@@ -35,17 +32,7 @@ public final class SlimeInABukkitPlugin extends JavaPlugin {
     private int activeSlimeCmd;
     private @NotNull String slimeBucketTitle = "";
     private @NotNull String chunkStatusFalse = "";
-    public SlimeInABukkitPlugin() {
-        super();
-        this.isTest = false;
-    }
-    private SlimeInABukkitPlugin(JavaPluginLoader loader,
-                                 PluginDescriptionFile descriptionFile,
-                                 File dataFolder,
-                                 File file) {
-        super(loader, descriptionFile, dataFolder, file);
-        this.isTest = true;
-    }
+
     private boolean canPickupSlime;
     private boolean debug;
 
@@ -60,7 +47,7 @@ public final class SlimeInABukkitPlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("get_slime")).setExecutor(new GetSlimeCommand(this));
         Objects.requireNonNull(getCommand("slime_chunk")).setExecutor(new SlimeChunkCommand(this));
 
-        if (!this.isTest) new Metrics(this, PLUGIN_ID);
+        new Metrics(this, PLUGIN_ID);
 
         Bukkit.getPluginManager().registerEvents(new SlimeListener(this), this);
     }
@@ -69,26 +56,26 @@ public final class SlimeInABukkitPlugin extends JavaPlugin {
         this.calmSlimeCmd = this.getConfig().getInt("custom-model-data.calm-slime", 404);
         this.activeSlimeCmd = this.getConfig().getInt("custom-model-data.active-slime", 200);
         this.slimeBucketTitle = ChatColor.translateAlternateColorCodes(
-          '&',
-          Objects.requireNonNull(this.getConfig().getString("bucket-title", DEFAULT_BUCKET_TITLE))
+            '&',
+            Objects.requireNonNull(this.getConfig().getString("bucket-title", DEFAULT_BUCKET_TITLE))
         );
         this.slimeChunkMessage = ChatColor.translateAlternateColorCodes(
-          '&',
-          Objects.requireNonNull(this.getConfig().getString(
-            "slime-chunk-message", DEFAULT_SLIME_CHUNK_MESSAGE
-          ))
+            '&',
+            Objects.requireNonNull(this.getConfig().getString(
+                "slime-chunk-message", DEFAULT_SLIME_CHUNK_MESSAGE
+            ))
         );
         this.chunkStatusTrue = ChatColor.translateAlternateColorCodes(
-          '&',
-          Objects.requireNonNull(this.getConfig().getString(
-            "chunk-status.true", DEFAULT_CHUNK_STATUS_TRUE
-          ))
+            '&',
+            Objects.requireNonNull(this.getConfig().getString(
+                "chunk-status.true", DEFAULT_CHUNK_STATUS_TRUE
+            ))
         );
         this.chunkStatusFalse = ChatColor.translateAlternateColorCodes(
-          '&',
-          Objects.requireNonNull(this.getConfig().getString(
-            "chunk-status.false", DEFAULT_CHUNK_STATUS_FALSE
-          ))
+            '&',
+            Objects.requireNonNull(this.getConfig().getString(
+                "chunk-status.false", DEFAULT_CHUNK_STATUS_FALSE
+            ))
         );
         this.canPickupSlime = this.getConfig().getBoolean("can-pickup-slime", DEFAULT_CAN_PICKUP_SLIME);
         this.debug = this.getConfig().getBoolean("debug", false);
@@ -130,7 +117,7 @@ public final class SlimeInABukkitPlugin extends JavaPlugin {
         return chunkStatusFalse;
     }
 
-    public boolean isCanPickupSlime() {
+    public boolean canPickupSlime() {
         return canPickupSlime;
     }
 

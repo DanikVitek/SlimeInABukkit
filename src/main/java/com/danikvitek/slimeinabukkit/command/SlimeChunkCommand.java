@@ -16,22 +16,25 @@ public class SlimeChunkCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+    public boolean onCommand(@NotNull CommandSender commandSender,
+                             @NotNull Command command,
+                             @NotNull String s,
+                             @NotNull String[] strings) {
         slimeChunkImpl(commandSender);
         return true;
     }
 
     private void slimeChunkImpl(CommandSender sender) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatColor.RED + "Command can only be used by a player");
             return;
         }
 
-        final Player player = (Player) sender;
-
         final String chunkStatus = player.getLocation().getChunk().isSlimeChunk()
-                                   ? this.main.getChunkStatusTrue()
-                                   : this.main.getChunkStatusFalse();
-        player.sendMessage(this.main.getSlimeChunkMessage().replace(SlimeInABukkitPlugin.CHUNK_STATUS_PLACEHOLDER, chunkStatus));
+            ? this.main.getChunkStatusTrue()
+            : this.main.getChunkStatusFalse();
+        player.sendMessage(this.main
+                               .getSlimeChunkMessage()
+                               .replace(SlimeInABukkitPlugin.CHUNK_STATUS_PLACEHOLDER, chunkStatus));
     }
 }

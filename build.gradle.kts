@@ -33,6 +33,7 @@ dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("de.tr7zw:item-nbt-api:2.10.0")
+    implementation("io.vavr:vavr:0.10.4")
 }
 
 java {

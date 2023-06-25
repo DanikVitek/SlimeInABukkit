@@ -17,6 +17,9 @@ permissions:
   "slimeinabukkit.command.slime_chunk":
     default: op
     description: "Allows to use the /slime_chunk command"
+  "slimeinabukkit.interact":
+    default: true
+    description: "Allows to use a bucket on a slime"
 
 commands:
   get_slime:

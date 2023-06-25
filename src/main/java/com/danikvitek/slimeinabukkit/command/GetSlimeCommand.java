@@ -36,22 +36,21 @@ public class GetSlimeCommand implements CommandExecutor {
     }
 
     private void getSlimeImpl(@NotNull CommandSender sender) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatColor.RED + "Command can only be used by a player");
             return;
         }
-
-        final Player player = (Player) sender;
 
         final ItemStack slimeBucket = new ItemStack(SLIME_BUCKET_MATERIAL);
         final ItemMeta slimeBucketMeta = slimeBucket.getItemMeta();
         assert slimeBucketMeta != null;
         final Location location = player.getLocation();
         slimeBucketMeta.setCustomModelData(
-          location.getChunk().isSlimeChunk()
-          ? main.getActiveSlimeCmd()
-          : main.getCalmSlimeCmd()
+            location.getChunk().isSlimeChunk()
+                ? main.getActiveSlimeCmd()
+                : main.getCalmSlimeCmd()
         );
+
         slimeBucketMeta.setDisplayName(main.getSlimeBucketTitle());
         slimeBucket.setItemMeta(slimeBucketMeta);
         final NBTItem nbtItem = new NBTItem(slimeBucket);
