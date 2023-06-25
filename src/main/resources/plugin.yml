@@ -1,7 +1,7 @@
 name: SlimeInABukkit
-version: '${project.version}'
+version: '${version}'
 main: com.danikvitek.slimeinabukkit.SlimeInABukkitPlugin
-api-version: 1.15
+api-version: '1.18'
 prefix: SlimeInABukkit
 authors: [ Danik_Vitek ]
 

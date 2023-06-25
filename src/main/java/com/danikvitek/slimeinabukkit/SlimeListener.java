@@ -95,24 +95,26 @@ public class SlimeListener implements Listener {
         final var player = event.getPlayer();
         final var inventory = player.getInventory();
 
-        if (event.getHand() == EquipmentSlot.OFF_HAND && inventory.getItemInMainHand().getType() != Material.AIR)
+        final boolean isMainHand = event.getHand() == EquipmentSlot.HAND;
+        if (!isMainHand && inventory.getItemInMainHand().getType() != Material.AIR)
             return;
         main.debugLog("PlayerInteractEvent: Hand = " + event.getHand());
-        final var itemStack = event.getHand() == EquipmentSlot.HAND
-                              ? inventory.getItemInMainHand()
-                              : inventory.getItemInOffHand();
+
+        final var itemStack = isMainHand
+            ? inventory.getItemInMainHand()
+            : inventory.getItemInOffHand();
+        if (itemStack.getType() != Material.BUCKET) return;
 
         final var itemMeta = itemStack.hasItemMeta()
-                             ? itemStack.getItemMeta()
-                             : new ItemStack(SLIME_BUCKET_MATERIAL).getItemMeta();
+            ? itemStack.getItemMeta()
+            : new ItemStack(SLIME_BUCKET_MATERIAL).getItemMeta();
         assert itemMeta != null;
-        if (itemStack.getType() != Material.BUCKET || itemMeta.hasCustomModelData()) return;
+        if (itemMeta.hasCustomModelData()) return;
 
-        pickupSlime(event, slime, player, itemStack, itemMeta, event.getHand());
+        pickupSlime(slime, player, itemStack, itemMeta, event.getHand());
     }
 
-    private void pickupSlime(final @NotNull PlayerInteractEntityEvent event,
-                             final @NotNull Slime slime,
+    private void pickupSlime(final @NotNull Slime slime,
                              final @NotNull Player player,
                              final @NotNull ItemStack bucketStack,
                              final @NotNull ItemMeta slimeBucketMeta,
@@ -124,15 +126,15 @@ public class SlimeListener implements Listener {
         final var slimeBucketStack = bucketStack.clone();
         slimeBucketStack.setAmount(1);
         slimeBucketMeta.setCustomModelData(
-          player.getLocation().getChunk().isSlimeChunk()
-          ? main.getActiveSlimeCmd()
-          : main.getCalmSlimeCmd()
+            player.getLocation().getChunk().isSlimeChunk()
+                ? main.getActiveSlimeCmd()
+                : main.getCalmSlimeCmd()
         );
         if (slime.getCustomName() != null) slimeBucketMeta.setDisplayName(slime.getCustomName());
         else slimeBucketMeta.setDisplayName(
-          slimeBucketMeta.hasDisplayName()
-          ? slimeBucketMeta.getDisplayName()
-          : main.getSlimeBucketTitle()
+            slimeBucketMeta.hasDisplayName()
+                ? slimeBucketMeta.getDisplayName()
+                : main.getSlimeBucketTitle()
         );
 
         slimeBucketStack.setItemMeta(slimeBucketMeta);
@@ -148,8 +150,8 @@ public class SlimeListener implements Listener {
             });
         } else player.getInventory().setItem(bucketStackSlot, slimeBucketStack);
 
-
-        if (event.getHand() == EquipmentSlot.HAND) player.swingMainHand();
+        // play hand swing animation
+        if (bucketStackSlot == EquipmentSlot.HAND) player.swingMainHand();
         else player.swingOffHand();
 
         new BukkitRunnable() {
@@ -188,7 +190,7 @@ public class SlimeListener implements Listener {
         assert itemMeta != null;
         if (!itemMeta.hasCustomModelData() ||
             (itemMeta.getCustomModelData() != main.getCalmSlimeCmd() &&
-             itemMeta.getCustomModelData() != main.getActiveSlimeCmd())) return;
+                itemMeta.getCustomModelData() != main.getActiveSlimeCmd())) return;
 
         placeSlime(event, player, itemStack, itemMeta);
     }
@@ -216,14 +218,14 @@ public class SlimeListener implements Listener {
         final BlockFace blockFace = event.getBlockFace();
 
         final Location slimeReleaseLocation = block.getLocation().clone()
-          .add(new Vector(0.5, 0d, 0.5))
-          .add(blockFace.getDirection());
+                                                   .add(new Vector(0.5, 0d, 0.5))
+                                                   .add(blockFace.getDirection());
         slimeReleaseLocation.setYaw(RANDOM.nextFloat() * 360f);
 
         player.getWorld().spawn(slimeReleaseLocation, Slime.class, slime -> {
             slime.setSize(1);
             if (itemMeta.hasDisplayName() && !Objects.equals(
-              ChatColor.stripColor(itemMeta.getDisplayName()), ChatColor.stripColor(main.getSlimeBucketTitle())
+                ChatColor.stripColor(itemMeta.getDisplayName()), ChatColor.stripColor(main.getSlimeBucketTitle())
             )) slime.setCustomName(itemMeta.getDisplayName());
         });
 
