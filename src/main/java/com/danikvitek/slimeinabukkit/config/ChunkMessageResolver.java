@@ -26,7 +26,7 @@ public class ChunkMessageResolver {
         this.chunkStatusFalse = chunkStatusFalse;
     }
 
-    public @NotNull Component resolve(final boolean chunkStatus) {
-        return messageFactory.apply(chunkStatus ? chunkStatusTrue : chunkStatusFalse);
+    public @NotNull Component resolve(final boolean isSlimeChunk) {
+        return messageFactory.apply(isSlimeChunk ? chunkStatusTrue : chunkStatusFalse);
     }
 }

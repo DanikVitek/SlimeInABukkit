@@ -1,13 +1,12 @@
-# the custom model data for a slime ball texture
 custom-model-data:
   calm-slime: 404
   active-slime: 200
-bucket-title: "<!italic><lang:item.slimeinabukkit.slime_bucket>"
+bucket-title: <!italic><lang:item.slimeinabukkit.slime_bucket>
 
-slime-chunk-message: "<gray>This chunk </gray><chunk-status><gray> a Slime chunk"
+slime-chunk-message: <gray>This chunk </gray><chunk-status><gray> a Slime chunk
 chunk-status:
-  true: "<green>is</green>"
-  false: "<red>is not</red>"
+  'true': <green>is
+  'false': <red>is not
 
 can-pickup-slime: true
 
