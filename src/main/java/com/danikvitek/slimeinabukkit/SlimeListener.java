@@ -2,10 +2,6 @@ package com.danikvitek.slimeinabukkit;
 
 import com.danikvitek.slimeinabukkit.config.PluginConfig;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import io.vavr.collection.Array;
-import io.vavr.collection.List;
-import io.vavr.collection.Stream;
-import io.vavr.control.Option;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -265,21 +261,18 @@ public class SlimeListener implements Listener {
     public void onCraftWithSlimeBucket(final @NotNull CraftItemEvent e) {
         final int matrixSize = e.getInventory().getMatrix().length;
         final Map<Integer, ItemStack> slotsAndStacksToReplaceWithSlimeBucket = new LinkedHashMap<>(matrixSize);
-        Stream.ofAll(Arrays.stream(e.getInventory().getMatrix()))
-              .map(Option::of)
-              .collect(List.collector())
-              .zipWithIndex()
-              .filter(pair -> pair._1.isDefined())
-              .map(pair -> pair.map1(Option::get))
-              .filter(pair -> pair._1.getType() == SLIME_BUCKET_MATERIAL && pair._1.hasItemMeta())
-              .filter(pair -> {
-                  final ItemMeta itemMeta = pair._1.getItemMeta();
-                  assert itemMeta != null;
-                  return itemMeta.hasCustomModelData() &&
-                      (itemMeta.getCustomModelData() == config.getCalmSlimeCmd() ||
-                          itemMeta.getCustomModelData() == config.getActiveSlimeCmd());
-              })
-              .forEach(pair -> slotsAndStacksToReplaceWithSlimeBucket.put(pair._2, pair._1.clone()));
+        io.vavr.collection.Iterator
+            .of(e.getInventory().getMatrix())
+            .zipWithIndex()
+            .filter(pair -> pair._1 != null && pair._1.getType() == SLIME_BUCKET_MATERIAL && pair._1.hasItemMeta())
+            .filter(pair -> {
+                final ItemMeta itemMeta = pair._1.getItemMeta();
+                assert itemMeta != null;
+                return itemMeta.hasCustomModelData() &&
+                    (itemMeta.getCustomModelData() == config.getCalmSlimeCmd() ||
+                        itemMeta.getCustomModelData() == config.getActiveSlimeCmd());
+            })
+            .forEach(pair -> slotsAndStacksToReplaceWithSlimeBucket.put(pair._2, pair._1.clone()));
 
         scheduler.runTaskLater(() -> {
             final ItemStack[] newMatrix = new ItemStack[matrixSize];
@@ -293,11 +286,12 @@ public class SlimeListener implements Listener {
                 removeUUID(clonedBucket);
                 newMatrix[slot] = clonedBucket;
             });
-            final Array<ItemStack> matrix1 = Array.ofAll(Arrays.stream(e.getInventory().getMatrix()));
-            for (int i = 0; i < matrix1.length(); i++) {
-                if (newMatrix[i] != null) continue;
-                newMatrix[i] = matrix1.get(i);
-            }
+
+            io.vavr.collection.Iterator
+                .of(e.getInventory().getMatrix())
+                .zipWithIndex()
+                .filter(pair -> newMatrix[pair._2] == null)
+                .forEach(pair -> newMatrix[pair._2] = pair._1);
             e.getInventory().setMatrix(newMatrix);
         }, 0L);
     }

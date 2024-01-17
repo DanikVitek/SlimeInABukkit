@@ -30,7 +30,7 @@ repositories {
 
 dependencies {
     paperweight.paperDevBundle("1.18.2-R0.1-SNAPSHOT")
-    compileOnly("org.jetbrains:annotations:24.0.1")
+    compileOnly("org.jetbrains:annotations:24.1.0")
     implementation("org.bstats:bstats-bukkit:3.0.2")
     implementation("de.tr7zw:item-nbt-api:2.12.2")
     implementation("io.vavr:vavr:0.10.4")
