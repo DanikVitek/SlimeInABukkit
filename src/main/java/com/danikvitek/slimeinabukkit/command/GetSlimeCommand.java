@@ -1,6 +1,6 @@
 package com.danikvitek.slimeinabukkit.command;
 
-import com.danikvitek.slimeinabukkit.PluginConfig;
+import com.danikvitek.slimeinabukkit.config.PluginConfig;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

@@ -1,6 +1,6 @@
 package com.danikvitek.slimeinabukkit.command;
 
-import com.danikvitek.slimeinabukkit.ChunkMessageResolver;
+import com.danikvitek.slimeinabukkit.config.ChunkMessageResolver;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

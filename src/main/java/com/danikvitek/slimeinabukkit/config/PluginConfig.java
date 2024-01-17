@@ -1,8 +1,7 @@
-package com.danikvitek.slimeinabukkit;
+package com.danikvitek.slimeinabukkit.config;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,8 +15,10 @@ public class PluginConfig {
     private static final String DEFAULT_CHUNK_STATUS_FALSE = "<red>is not";
     private static final boolean DEFAULT_CAN_PICKUP_SLIME = true;
     private static final boolean DEFAULT_DEBUG = false;
+
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
-    private final @NotNull Plugin configAccessor;
+
+    private final @NotNull ConfigAccessor configAccessor;
     private int calmSlimeCmd;
     private int activeSlimeCmd;
     private Component slimeBucketTitle;
@@ -28,7 +29,7 @@ public class PluginConfig {
     private boolean debug;
 
     @Contract(pure = false)
-    public PluginConfig(@NotNull Plugin configAccessor) {
+    public PluginConfig(@NotNull ConfigAccessor configAccessor) {
         this.configAccessor = configAccessor;
         read();
         update();
@@ -49,6 +50,7 @@ public class PluginConfig {
 
     public void update() {
         final var config = configAccessor.getConfig();
+
         config.set("custom-model-data.calm-slime", calmSlimeCmd);
         config.set("custom-model-data.active-slime", activeSlimeCmd);
         config.set("bucket-title", MINI_MESSAGE.serialize(slimeBucketTitle));
@@ -57,6 +59,7 @@ public class PluginConfig {
         config.set("chunk-status.false", MINI_MESSAGE.serialize(chunkStatusFalse));
         config.set("can-pickup-slime", canPickupSlime);
         config.set("debug", debug);
+
         configAccessor.saveConfig();
     }
 

@@ -1,4 +1,4 @@
-package com.danikvitek.slimeinabukkit;
+package com.danikvitek.slimeinabukkit.config;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
-import static com.danikvitek.slimeinabukkit.PluginConfig.CHUNK_STATUS_PLACEHOLDER;
+import static com.danikvitek.slimeinabukkit.config.PluginConfig.CHUNK_STATUS_PLACEHOLDER;
 
 public class ChunkMessageResolver {
     private final @NotNull Function<ComponentLike, Component> messageFactory;
@@ -16,8 +16,8 @@ public class ChunkMessageResolver {
     private final @NotNull ComponentLike chunkStatusFalse;
 
     public ChunkMessageResolver(final @NotNull String message,
-                                final @NotNull Component chunkStatusTrue,
-                                final @NotNull Component chunkStatusFalse) {
+                                final @NotNull ComponentLike chunkStatusTrue,
+                                final @NotNull ComponentLike chunkStatusFalse) {
         messageFactory = c -> MiniMessage.miniMessage().deserialize(
             message,
             Placeholder.component(CHUNK_STATUS_PLACEHOLDER, c)

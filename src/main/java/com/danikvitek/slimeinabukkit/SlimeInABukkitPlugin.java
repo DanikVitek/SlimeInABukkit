@@ -2,6 +2,9 @@ package com.danikvitek.slimeinabukkit;
 
 import com.danikvitek.slimeinabukkit.command.GetSlimeCommand;
 import com.danikvitek.slimeinabukkit.command.SlimeChunkCommand;
+import com.danikvitek.slimeinabukkit.config.ChunkMessageResolver;
+import com.danikvitek.slimeinabukkit.config.ConfigAccessor;
+import com.danikvitek.slimeinabukkit.config.PluginConfig;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -10,34 +13,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public final class SlimeInABukkitPlugin extends JavaPlugin {
+public final class SlimeInABukkitPlugin extends JavaPlugin implements ConfigAccessor {
     public static final Material SLIME_BUCKET_MATERIAL = Material.SLIME_BALL;
     public static final String SLIME_BUCKET_UUID_KEY = "SLIME_UUID";
     private static final int PLUGIN_ID = 14716;
+
     private final Scheduler scheduler = new Scheduler(this, getServer().getScheduler());
-    private PluginConfig pluginConfig;
+    private final PluginConfig pluginConfig = new PluginConfig(this);
 
     @Override
     public void onEnable() {
         this.getConfig().options().configuration();
         this.saveDefaultConfig();
-
-//        final TranslationRegistry registry = TranslationRegistry
-//            .create(Key.key("slimeinabukkit:en"));
-//        registry.registerAll(Locale.ROOT, Map.of(
-//            SLIME_BUCKET_TITLE_TRANSLATION_KEY,
-//            new MessageFormat("Slime in a bucket", Locale.ROOT)
-//        ));
-//        final var ukUA = new Locale("uk", "UA");
-//        registry.registerAll(ukUA, Map.of(
-//            SLIME_BUCKET_TITLE_TRANSLATION_KEY,
-//            new MessageFormat("Слизень у відрі", ukUA)
-//        ));
-//        GlobalTranslator.translator()
-//                        .addSource(
-//                            registry
-//                        );
-        pluginConfig = new PluginConfig(this);
 
         Objects.requireNonNull(getCommand("get_slime")).setExecutor(new GetSlimeCommand(pluginConfig));
 

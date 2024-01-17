@@ -1,5 +1,6 @@
 package com.danikvitek.slimeinabukkit;
 
+import com.danikvitek.slimeinabukkit.config.PluginConfig;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.vavr.collection.Array;
 import io.vavr.collection.List;
