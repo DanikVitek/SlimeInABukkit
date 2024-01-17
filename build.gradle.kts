@@ -1,8 +1,8 @@
 plugins {
     `java-library`
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("io.papermc.paperweight.userdev") version "1.5.5"
-    id("xyz.jpenilla.run-paper") version "2.1.0"
+    id("io.papermc.paperweight.userdev") version "1.5.11"
+    id("xyz.jpenilla.run-paper") version "2.2.2"
 }
 
 group = "com.danikvitek"
@@ -41,6 +41,9 @@ java {
 }
 
 tasks {
+    assemble {
+        dependsOn(reobfJar)
+    }
     shadowJar {
         relocate("org.bstats", "com.danikvitek.bstats")
         relocate("de.tr7zw", "com.danikvitek.itemnbtapi")
@@ -64,7 +67,7 @@ tasks {
     processResources {
         filteringCharset = Charsets.UTF_8.name() // We want UTF-8 for everything
         val props = mapOf(
-                "version" to project.version,
+            "version" to project.version,
         )
         inputs.properties(props)
         filesMatching("plugin.yml") {

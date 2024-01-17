@@ -2,12 +2,12 @@
 custom-model-data:
   calm-slime: 404
   active-slime: 200
-bucket-title: "&rSlime in a bucket"
+bucket-title: "<!italic><lang:item.slimeinabukkit.slime_bucket>"
 
-slime-chunk-message: "&7This chunk %chunk-status%&7 a Slime chunk"
+slime-chunk-message: "<gray>This chunk </gray><chunk-status><gray> a Slime chunk"
 chunk-status:
-  true: "&ais"
-  false: "&cis not"
+  true: "<green>is</green>"
+  false: "<red>is not</red>"
 
 can-pickup-slime: true
 
