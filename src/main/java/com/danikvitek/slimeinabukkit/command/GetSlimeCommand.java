@@ -1,8 +1,9 @@
 package com.danikvitek.slimeinabukkit.command;
 
-import com.danikvitek.slimeinabukkit.SlimeInABukkitPlugin;
+import com.danikvitek.slimeinabukkit.config.PluginConfig;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -20,10 +21,10 @@ import static com.danikvitek.slimeinabukkit.SlimeInABukkitPlugin.SLIME_BUCKET_MA
 import static com.danikvitek.slimeinabukkit.SlimeInABukkitPlugin.SLIME_BUCKET_UUID_KEY;
 
 public class GetSlimeCommand implements CommandExecutor {
-    private final SlimeInABukkitPlugin main;
+    private final @NotNull PluginConfig config;
 
-    public GetSlimeCommand(SlimeInABukkitPlugin main) {
-        this.main = main;
+    public GetSlimeCommand(@NotNull PluginConfig config) {
+        this.config = config;
     }
 
     @Override
@@ -36,23 +37,22 @@ public class GetSlimeCommand implements CommandExecutor {
     }
 
     private void getSlimeImpl(@NotNull CommandSender sender) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Command can only be used by a player");
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(Component.text("Command can only be used by a player", NamedTextColor.RED));
             return;
         }
-
-        final Player player = (Player) sender;
 
         final ItemStack slimeBucket = new ItemStack(SLIME_BUCKET_MATERIAL);
         final ItemMeta slimeBucketMeta = slimeBucket.getItemMeta();
         assert slimeBucketMeta != null;
         final Location location = player.getLocation();
         slimeBucketMeta.setCustomModelData(
-          location.getChunk().isSlimeChunk()
-          ? main.getActiveSlimeCmd()
-          : main.getCalmSlimeCmd()
+            location.getChunk().isSlimeChunk()
+                ? config.getActiveSlimeCmd()
+                : config.getCalmSlimeCmd()
         );
-        slimeBucketMeta.setDisplayName(main.getSlimeBucketTitle());
+
+        slimeBucketMeta.displayName(config.getSlimeBucketTitle());
         slimeBucket.setItemMeta(slimeBucketMeta);
         final NBTItem nbtItem = new NBTItem(slimeBucket);
         nbtItem.setUUID(SLIME_BUCKET_UUID_KEY, UUID.randomUUID()); // for it to be not stackable
