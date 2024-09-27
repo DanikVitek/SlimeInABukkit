@@ -234,7 +234,6 @@ public class SlimeListener implements Listener {
         player.getWorld().spawn(slimeReleaseLocation, Slime.class, slime -> {
             slime.setSize(1);
             final var serializer = PlainTextComponentSerializer.plainText();
-
             ISUtil.useDisplayName(itemMeta, displayName -> {
                 if (!serializer.serialize(displayName)
                                .equals(serializer.serialize(config.getSlimeBucketTitle()))) {
