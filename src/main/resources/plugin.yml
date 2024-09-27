@@ -24,9 +24,9 @@ permissions:
 commands:
   get_slime:
     permission: "slimeinabukkit.command.get_slime"
-    usage: "/get_slime | /gs"
+    usage: "/get_slime"
     description: "Gives a bucket of slime to the player"
   slime_chunk:
     permission: "slimeinabukkit.command.slime_chunk"
-    usage: "/slime_chunk | /sc"
+    usage: "/slime_chunk"
     description: "Tells you, if the chunk you are in is a slime chunk"

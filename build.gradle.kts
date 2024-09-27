@@ -1,12 +1,12 @@
 plugins {
     `java-library`
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("io.papermc.paperweight.userdev") version "1.5.11"
-    id("xyz.jpenilla.run-paper") version "2.2.2"
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.paperweight.userdev)
+    alias(libs.plugins.runpaper)
 }
 
 group = "com.danikvitek"
-version = "2.0"
+version = "2.1"
 
 repositories {
     mavenCentral()
@@ -30,10 +30,10 @@ repositories {
 
 dependencies {
     paperweight.paperDevBundle("1.18.2-R0.1-SNAPSHOT")
-    compileOnly("org.jetbrains:annotations:24.1.0")
-    implementation("org.bstats:bstats-bukkit:3.0.2")
-    implementation("de.tr7zw:item-nbt-api:2.12.2")
-    implementation("io.vavr:vavr:0.10.4")
+    compileOnly(libs.jetbrains.annotations)
+    implementation(libs.bstats.bukkit)
+    implementation(libs.itemnbt.api)
+    implementation(libs.vavr)
 }
 
 java {

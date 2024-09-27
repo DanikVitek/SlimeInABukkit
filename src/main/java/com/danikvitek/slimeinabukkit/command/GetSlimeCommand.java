@@ -1,7 +1,7 @@
 package com.danikvitek.slimeinabukkit.command;
 
 import com.danikvitek.slimeinabukkit.config.PluginConfig;
-import de.tr7zw.changeme.nbtapi.NBTItem;
+import de.tr7zw.changeme.nbtapi.NBT;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -54,13 +54,14 @@ public class GetSlimeCommand implements CommandExecutor {
 
         slimeBucketMeta.displayName(config.getSlimeBucketTitle());
         slimeBucket.setItemMeta(slimeBucketMeta);
-        final NBTItem nbtItem = new NBTItem(slimeBucket);
-        nbtItem.setUUID(SLIME_BUCKET_UUID_KEY, UUID.randomUUID()); // for it to be not stackable
-        nbtItem.applyNBT(slimeBucket);
+        NBT.modify(slimeBucket, nbt -> {
+            nbt.setUUID(SLIME_BUCKET_UUID_KEY, UUID.randomUUID()); // for it to be not stackable
+        });
 
         final World world = player.getWorld();
         world.playSound(location, Sound.ENTITY_ITEM_PICKUP, 1f, 1f);
-        if (!player.getInventory().addItem(slimeBucket).isEmpty())
+        if (!player.getInventory().addItem(slimeBucket).isEmpty()) {
             world.dropItem(player.getEyeLocation(), slimeBucket);
+        }
     }
 }

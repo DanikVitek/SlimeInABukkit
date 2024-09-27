@@ -1,7 +1,11 @@
 package com.danikvitek.slimeinabukkit;
 
 import com.danikvitek.slimeinabukkit.config.PluginConfig;
-import de.tr7zw.changeme.nbtapi.NBTItem;
+import com.danikvitek.slimeinabukkit.util.ISUtil;
+import de.tr7zw.changeme.nbtapi.NBT;
+import io.vavr.collection.Iterator;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -18,15 +22,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +41,7 @@ public class SlimeListener implements Listener {
     public static final String SLIME_INTERACT_PERMISSION = "slimeinabukkit.interact";
     public static final Random RANDOM = new Random();
 
-    private static final Set<UUID> interactingPlayers = new LinkedHashSet<>();
+    private static final Set<UUID> interactingPlayers = new HashSet<>();
     private static final Map<Item, Chunk> lastItemChunks = new ConcurrentHashMap<>();
 
     private final @NotNull PluginConfig config;
@@ -167,9 +167,9 @@ public class SlimeListener implements Listener {
 
     private void assignUUID(final @NotNull ItemStack slimeBucketStack,
                             final @NotNull UUID uuid) {
-        final var nbtItem = new NBTItem(slimeBucketStack);
-        nbtItem.setUUID(SLIME_BUCKET_UUID_KEY, uuid);
-        nbtItem.applyNBT(slimeBucketStack);
+        NBT.modify(slimeBucketStack, nbt -> {
+            nbt.setUUID(SLIME_BUCKET_UUID_KEY, uuid);
+        });
     }
 
     @EventHandler
@@ -193,9 +193,9 @@ public class SlimeListener implements Listener {
         assert itemMeta != null;
         if (!itemMeta.hasCustomModelData() ||
             (itemMeta.getCustomModelData() != config.getCalmSlimeCmd() &&
-                itemMeta.getCustomModelData() != config.getActiveSlimeCmd())) return;
+             itemMeta.getCustomModelData() != config.getActiveSlimeCmd())) return;
 
-        placeSlime(event, player, itemStack, itemMeta);
+        placeSlime(event, player, itemStack);
     }
 
     private boolean checkCannotPickupSlime(@NotNull Player player) {
@@ -213,30 +213,34 @@ public class SlimeListener implements Listener {
 
     private void placeSlime(final @NotNull PlayerInteractEvent event,
                             final @NotNull Player player,
-                            final @NotNull ItemStack itemStack,
-                            final @NotNull ItemMeta itemMeta) {
+                            final @NotNull ItemStack itemStack) {
+        if (!itemStack.hasItemMeta()) throw new AssertionError("ItemStack has no ItemMeta");
+        final ItemMeta itemMeta = itemStack.getItemMeta();
+
         if (interactingPlayers.contains(player.getUniqueId())) return;
         interactingPlayers.add(player.getUniqueId());
 
         event.setUseInteractedBlock(Event.Result.DENY);
 
         final Block block = event.getClickedBlock();
-        assert block != null;
+        assert block != null; // because the event.action is RIGHT_CLICK_BLOCK
         final BlockFace blockFace = event.getBlockFace();
 
-        final Location slimeReleaseLocation = block.getLocation().clone()
-                                                   .add(new Vector(0.5, 0d, 0.5))
+        final Location slimeReleaseLocation = block.getLocation()
+                                                   .add(0.5, 0d, 0.5)
                                                    .add(blockFace.getDirection());
         slimeReleaseLocation.setYaw(RANDOM.nextFloat() * 360f);
 
         player.getWorld().spawn(slimeReleaseLocation, Slime.class, slime -> {
             slime.setSize(1);
             final var serializer = PlainTextComponentSerializer.plainText();
-            if (itemMeta.hasDisplayName() &&
-                !serializer.serialize(itemMeta.displayName())
-                           .equals(serializer.serialize(config.getSlimeBucketTitle()))) {
-                slime.customName(itemMeta.displayName());
-            }
+
+            ISUtil.useDisplayName(itemMeta, displayName -> {
+                if (!serializer.serialize(displayName)
+                               .equals(serializer.serialize(config.getSlimeBucketTitle()))) {
+                    slime.customName(itemMeta.displayName());
+                }
+            });
         });
 
         itemMeta.setCustomModelData(null);
@@ -252,27 +256,35 @@ public class SlimeListener implements Listener {
     }
 
     private void removeUUID(final @NotNull ItemStack itemStack) {
-        final var nbtItem = new NBTItem(itemStack);
-        nbtItem.removeKey(SLIME_BUCKET_UUID_KEY);
-        nbtItem.applyNBT(itemStack);
+        NBT.modify(itemStack, nbt -> {
+            nbt.removeKey(SLIME_BUCKET_UUID_KEY);
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCraftWithSlimeBucket(final @NotNull CraftItemEvent e) {
         final int matrixSize = e.getInventory().getMatrix().length;
-        final Map<Integer, ItemStack> slotsAndStacksToReplaceWithSlimeBucket = new LinkedHashMap<>(matrixSize);
-        io.vavr.collection.Iterator
-            .of(e.getInventory().getMatrix())
-            .zipWithIndex()
-            .filter(pair -> pair._1 != null && pair._1.getType() == SLIME_BUCKET_MATERIAL && pair._1.hasItemMeta())
-            .filter(pair -> {
-                final ItemMeta itemMeta = pair._1.getItemMeta();
-                assert itemMeta != null;
-                return itemMeta.hasCustomModelData() &&
-                    (itemMeta.getCustomModelData() == config.getCalmSlimeCmd() ||
-                        itemMeta.getCustomModelData() == config.getActiveSlimeCmd());
-            })
-            .forEach(pair -> slotsAndStacksToReplaceWithSlimeBucket.put(pair._2, pair._1.clone()));
+        final Int2ObjectMap<@NotNull ItemStack> slotsAndStacksToReplaceWithSlimeBucket =
+            new Int2ObjectLinkedOpenHashMap<>(matrixSize);
+        Iterator.of(e.getInventory().getMatrix())
+                .zipWithIndex()
+                .filter(pair -> {
+                    final ItemStack itemStack = pair._1;
+                    if (itemStack == null || itemStack.getType() != SLIME_BUCKET_MATERIAL || !itemStack.hasItemMeta()) {
+                        return false;
+                    }
+                    final ItemMeta itemMeta = itemStack.getItemMeta();
+                    assert itemMeta != null;
+                    return itemMeta.hasCustomModelData() &&
+                           (itemMeta.getCustomModelData() == config.getCalmSlimeCmd() ||
+                            itemMeta.getCustomModelData() == config.getActiveSlimeCmd());
+                })
+                .forEach(pair -> {
+                    final ItemStack itemStack = pair._1;
+                    assert itemStack != null;
+                    final int slot = pair._2;
+                    slotsAndStacksToReplaceWithSlimeBucket.put(slot, itemStack.clone());
+                });
 
         scheduler.runTaskLater(() -> {
             final ItemStack[] newMatrix = new ItemStack[matrixSize];
@@ -287,11 +299,10 @@ public class SlimeListener implements Listener {
                 newMatrix[slot] = clonedBucket;
             });
 
-            io.vavr.collection.Iterator
-                .of(e.getInventory().getMatrix())
-                .zipWithIndex()
-                .filter(pair -> newMatrix[pair._2] == null)
-                .forEach(pair -> newMatrix[pair._2] = pair._1);
+            Iterator.of(e.getInventory().getMatrix())
+                    .zipWithIndex()
+                    .filter(pair -> newMatrix[pair._2] == null)
+                    .forEach(pair -> newMatrix[pair._2] = pair._1);
             e.getInventory().setMatrix(newMatrix);
         }, 0L);
     }
@@ -325,5 +336,10 @@ public class SlimeListener implements Listener {
                 itemDrop.setItemStack(itemStack);
             }
         }, 0L, 1L);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerQuit(final @NotNull PlayerQuitEvent event) {
+        interactingPlayers.remove(event.getPlayer().getUniqueId());
     }
 }
