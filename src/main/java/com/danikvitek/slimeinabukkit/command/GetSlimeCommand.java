@@ -1,7 +1,7 @@
 package com.danikvitek.slimeinabukkit.command;
 
 import com.danikvitek.slimeinabukkit.config.PluginConfig;
-import de.tr7zw.changeme.nbtapi.NBT;
+import com.danikvitek.slimeinabukkit.persistence.PersistentContainerAccessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -18,13 +18,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 import static com.danikvitek.slimeinabukkit.SlimeInABukkitPlugin.SLIME_BUCKET_MATERIAL;
-import static com.danikvitek.slimeinabukkit.SlimeInABukkitPlugin.SLIME_BUCKET_UUID_KEY;
 
 public class GetSlimeCommand implements CommandExecutor {
     private final @NotNull PluginConfig config;
+    private final @NotNull PersistentContainerAccessor persistentContainerAccessor;
 
-    public GetSlimeCommand(@NotNull PluginConfig config) {
+    public GetSlimeCommand(@NotNull PluginConfig config,
+                           @NotNull PersistentContainerAccessor persistentContainerAccessor) {
         this.config = config;
+        this.persistentContainerAccessor = persistentContainerAccessor;
     }
 
     @Override
@@ -53,10 +55,8 @@ public class GetSlimeCommand implements CommandExecutor {
         );
 
         slimeBucketMeta.displayName(config.getSlimeBucketTitle());
+        persistentContainerAccessor.setSlimeBucketUUID(slimeBucketMeta, UUID.randomUUID()); // for it to be not stackable
         slimeBucket.setItemMeta(slimeBucketMeta);
-        NBT.modify(slimeBucket, nbt -> {
-            nbt.setUUID(SLIME_BUCKET_UUID_KEY, UUID.randomUUID()); // for it to be not stackable
-        });
 
         final World world = player.getWorld();
         world.playSound(location, Sound.ENTITY_ITEM_PICKUP, 1f, 1f);

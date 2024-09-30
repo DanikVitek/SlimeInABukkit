@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.danikvitek"
-version = "2.1"
+version = "2.2"
 
 repositories {
     mavenCentral()
@@ -32,7 +32,6 @@ dependencies {
     paperweight.paperDevBundle("1.18.2-R0.1-SNAPSHOT")
     compileOnly(libs.jetbrains.annotations)
     implementation(libs.bstats.bukkit)
-    implementation(libs.itemnbt.api)
     implementation(libs.vavr)
 }
 
@@ -46,7 +45,6 @@ tasks {
     }
     shadowJar {
         relocate("org.bstats", "com.danikvitek.bstats")
-        relocate("de.tr7zw.changeme.nbtapi", "com.danikvitek.itemnbtapi")
     }
     build {
         dependsOn(shadowJar)
