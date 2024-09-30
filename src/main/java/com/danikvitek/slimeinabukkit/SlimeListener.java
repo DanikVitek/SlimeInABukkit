@@ -3,7 +3,9 @@ package com.danikvitek.slimeinabukkit;
 import com.danikvitek.slimeinabukkit.config.PluginConfig;
 import com.danikvitek.slimeinabukkit.persistence.PersistentContainerAccessor;
 import com.danikvitek.slimeinabukkit.util.ISUtil;
-import io.vavr.collection.Iterator;
+import com.danikvitek.slimeinabukkit.util.Option;
+import com.danikvitek.slimeinabukkit.util.iterator.Indexed;
+import com.danikvitek.slimeinabukkit.util.iterator.Iterator;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -257,22 +259,24 @@ public class SlimeListener implements Listener {
             new Int2ObjectLinkedOpenHashMap<>(matrixSize);
         Iterator.of(e.getInventory().getMatrix())
                 .zipWithIndex()
-                .filter(pair -> {
-                    final ItemStack itemStack = pair._1;
+                .<@NotNull Indexed<ItemStack>>filterMap(itemStackIndexed -> {
+                    final @Nullable ItemStack itemStack = itemStackIndexed.value();
                     if (itemStack == null || itemStack.getType() != SLIME_BUCKET_MATERIAL || !itemStack.hasItemMeta()) {
-                        return false;
+                        return Option.none();
                     }
+
                     final ItemMeta itemMeta = itemStack.getItemMeta();
-                    assert itemMeta != null;
                     return itemMeta.hasCustomModelData() &&
                            (itemMeta.getCustomModelData() == config.getCalmSlimeCmd() ||
-                            itemMeta.getCustomModelData() == config.getActiveSlimeCmd());
+                            itemMeta.getCustomModelData() == config.getActiveSlimeCmd())
+                        ? Option.some(itemStackIndexed)
+                        : Option.none();
                 })
-                .forEach(pair -> {
-                    final ItemStack itemStack = pair._1;
-                    assert itemStack != null;
-                    final int slot = pair._2;
-                    slotsAndStacksToReplaceWithSlimeBucket.put(slot, itemStack.clone());
+                .forEach(itemStackIndexed -> {
+                    final ItemStack itemStack = itemStackIndexed.value();
+                    slotsAndStacksToReplaceWithSlimeBucket.put(
+                        itemStackIndexed.index(), itemStack.clone()
+                    );
                 });
 
         scheduler.runTaskLater(() -> {
@@ -290,8 +294,8 @@ public class SlimeListener implements Listener {
 
             Iterator.of(e.getInventory().getMatrix())
                     .zipWithIndex()
-                    .filter(pair -> newMatrix[pair._2] == null)
-                    .forEach(pair -> newMatrix[pair._2] = pair._1);
+                    .filter(itemStackIndexed -> newMatrix[itemStackIndexed.index()] == null)
+                    .forEach(itemStackIndexed -> newMatrix[itemStackIndexed.index()] = itemStackIndexed.value());
             e.getInventory().setMatrix(newMatrix);
         }, 0L);
     }
