@@ -149,7 +149,7 @@ public class SlimeListener implements Listener {
 
         slimeBucketStack.setItemMeta(slimeBucketMeta);
         slimeBucketStack.setType(SLIME_BUCKET_MATERIAL);
-        assignUUID(slimeBucketStack, slime.getUniqueId());
+        persistentContainerAccessor.setSlimeBucketUUID(slimeBucketStack, slime.getUniqueId());
         if (bucketStack.getAmount() > 1) {
             bucketStack.setAmount(bucketStack.getAmount() - 1);
             final var notFittedItems = player.getInventory().addItem(slimeBucketStack);
@@ -165,11 +165,6 @@ public class SlimeListener implements Listener {
         else player.swingOffHand();
 
         scheduler.runTask(() -> interactingPlayers.remove(player.getUniqueId()));
-    }
-
-    private void assignUUID(final @NotNull ItemStack slimeBucketStack,
-                            final @NotNull UUID uuid) {
-        persistentContainerAccessor.setSlimeBucketUUID(slimeBucketStack, uuid);
     }
 
     @EventHandler
@@ -245,18 +240,14 @@ public class SlimeListener implements Listener {
 
         itemMeta.setCustomModelData(null);
         itemMeta.displayName(null);
+        persistentContainerAccessor.removeSlimeBucketUUID(itemMeta);
         itemStack.setItemMeta(itemMeta);
         itemStack.setType(Material.BUCKET);
-        removeUUID(itemStack);
 
         if (event.getHand() == EquipmentSlot.HAND) player.swingMainHand();
         else player.swingOffHand();
 
         scheduler.runTask(() -> interactingPlayers.remove(player.getUniqueId()));
-    }
-
-    private void removeUUID(final @NotNull ItemStack itemStack) {
-        persistentContainerAccessor.removeSlimeBucketUUID(itemStack);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -292,8 +283,8 @@ public class SlimeListener implements Listener {
                 assert clonedBucketMeta != null;
                 clonedBucketMeta.setCustomModelData(null);
                 clonedBucketMeta.displayName(null);
+                persistentContainerAccessor.removeSlimeBucketUUID(clonedBucketMeta);
                 clonedBucket.setItemMeta(clonedBucketMeta);
-                removeUUID(clonedBucket);
                 newMatrix[slot] = clonedBucket;
             });
 

@@ -55,8 +55,8 @@ public class GetSlimeCommand implements CommandExecutor {
         );
 
         slimeBucketMeta.displayName(config.getSlimeBucketTitle());
+        persistentContainerAccessor.setSlimeBucketUUID(slimeBucketMeta, UUID.randomUUID()); // for it to be not stackable
         slimeBucket.setItemMeta(slimeBucketMeta);
-        persistentContainerAccessor.setSlimeBucketUUID(slimeBucket, UUID.randomUUID()); // for it to be not stackable
 
         final World world = player.getWorld();
         world.playSound(location, Sound.ENTITY_ITEM_PICKUP, 1f, 1f);

@@ -17,13 +17,21 @@ public class PersistentContainerAccessor {
 
     public void setSlimeBucketUUID(final @NotNull ItemStack itemStack, final @NotNull UUID uuid) {
         final ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.getPersistentDataContainer().set(slimeBucketUuidKey, UUIDTagType.INSTANCE, uuid);
+        setSlimeBucketUUID(itemMeta, uuid);
         itemStack.setItemMeta(itemMeta);
+    }
+
+    public void setSlimeBucketUUID(final @NotNull ItemMeta itemMeta, final @NotNull UUID uuid) {
+        itemMeta.getPersistentDataContainer().set(slimeBucketUuidKey, UUIDTagType.INSTANCE, uuid);
     }
 
     public void removeSlimeBucketUUID(final @NotNull ItemStack itemStack) {
         final ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.getPersistentDataContainer().remove(slimeBucketUuidKey);
+        removeSlimeBucketUUID(itemMeta);
         itemStack.setItemMeta(itemMeta);
+    }
+
+    public void removeSlimeBucketUUID(final @NotNull ItemMeta itemMeta) {
+        itemMeta.getPersistentDataContainer().remove(slimeBucketUuidKey);
     }
 }
