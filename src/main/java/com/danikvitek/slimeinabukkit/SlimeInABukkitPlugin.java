@@ -5,9 +5,11 @@ import com.danikvitek.slimeinabukkit.command.SlimeChunkCommand;
 import com.danikvitek.slimeinabukkit.config.ChunkMessageResolver;
 import com.danikvitek.slimeinabukkit.config.ConfigAccessor;
 import com.danikvitek.slimeinabukkit.config.PluginConfig;
+import com.danikvitek.slimeinabukkit.persistence.PersistentContainerAccessor;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +17,6 @@ import java.util.Objects;
 
 public final class SlimeInABukkitPlugin extends JavaPlugin implements ConfigAccessor {
     public static final Material SLIME_BUCKET_MATERIAL = Material.SLIME_BALL;
-    public static final String SLIME_BUCKET_UUID_KEY = "SLIME_UUID";
     private static final int PLUGIN_ID = 14716;
 
     private final Scheduler scheduler = new Scheduler(this, getServer().getScheduler());
@@ -26,7 +27,10 @@ public final class SlimeInABukkitPlugin extends JavaPlugin implements ConfigAcce
         this.getConfig().options().configuration();
         this.saveDefaultConfig();
 
-        Objects.requireNonNull(getCommand("get_slime")).setExecutor(new GetSlimeCommand(pluginConfig));
+        final var persistentContainerAccessor = new PersistentContainerAccessor(new NamespacedKey(this, "slime-uuid"));
+
+        Objects.requireNonNull(getCommand("get_slime"))
+               .setExecutor(new GetSlimeCommand(pluginConfig, persistentContainerAccessor));
 
         final var messageResolver = new ChunkMessageResolver(
             pluginConfig.getSlimeChunkMessage(),
@@ -37,7 +41,15 @@ public final class SlimeInABukkitPlugin extends JavaPlugin implements ConfigAcce
 
         new Metrics(this, PLUGIN_ID);
 
-        Bukkit.getPluginManager().registerEvents(new SlimeListener(pluginConfig, this::debugLog, scheduler), this);
+        Bukkit.getPluginManager().registerEvents(
+            new SlimeListener(
+                pluginConfig,
+                this::debugLog,
+                scheduler,
+                persistentContainerAccessor
+            ),
+            this
+        );
     }
 
     @Override

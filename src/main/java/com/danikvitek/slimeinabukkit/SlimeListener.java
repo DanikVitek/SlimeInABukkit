@@ -1,8 +1,8 @@
 package com.danikvitek.slimeinabukkit;
 
 import com.danikvitek.slimeinabukkit.config.PluginConfig;
+import com.danikvitek.slimeinabukkit.persistence.PersistentContainerAccessor;
 import com.danikvitek.slimeinabukkit.util.ISUtil;
-import de.tr7zw.changeme.nbtapi.NBT;
 import io.vavr.collection.Iterator;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -35,7 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static com.danikvitek.slimeinabukkit.SlimeInABukkitPlugin.SLIME_BUCKET_MATERIAL;
-import static com.danikvitek.slimeinabukkit.SlimeInABukkitPlugin.SLIME_BUCKET_UUID_KEY;
 
 public class SlimeListener implements Listener {
     public static final String SLIME_INTERACT_PERMISSION = "slimeinabukkit.interact";
@@ -47,13 +46,16 @@ public class SlimeListener implements Listener {
     private final @NotNull PluginConfig config;
     private final @NotNull Consumer<String> debugLog;
     private final @NotNull Scheduler scheduler;
+    private final @NotNull PersistentContainerAccessor persistentContainerAccessor;
 
     public SlimeListener(@NotNull PluginConfig config,
                          @NotNull Consumer<String> debugLog,
-                         @NotNull Scheduler scheduler) {
+                         @NotNull Scheduler scheduler,
+                         @NotNull PersistentContainerAccessor persistentContainerAccessor) {
         this.config = config;
         this.debugLog = debugLog;
         this.scheduler = scheduler;
+        this.persistentContainerAccessor = persistentContainerAccessor;
     }
 
     @EventHandler
@@ -167,9 +169,7 @@ public class SlimeListener implements Listener {
 
     private void assignUUID(final @NotNull ItemStack slimeBucketStack,
                             final @NotNull UUID uuid) {
-        NBT.modify(slimeBucketStack, nbt -> {
-            nbt.setUUID(SLIME_BUCKET_UUID_KEY, uuid);
-        });
+        persistentContainerAccessor.setSlimeBucketUUID(slimeBucketStack, uuid);
     }
 
     @EventHandler
@@ -256,9 +256,7 @@ public class SlimeListener implements Listener {
     }
 
     private void removeUUID(final @NotNull ItemStack itemStack) {
-        NBT.modify(itemStack, nbt -> {
-            nbt.removeKey(SLIME_BUCKET_UUID_KEY);
-        });
+        persistentContainerAccessor.removeSlimeBucketUUID(itemStack);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
