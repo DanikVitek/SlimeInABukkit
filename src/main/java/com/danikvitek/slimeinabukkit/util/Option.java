@@ -7,10 +7,12 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public sealed interface Option<T> {
-    static <T> Option<T> some(T value) {
+    @Contract(value = "_ -> new", pure = true)
+    static <T> @NotNull Option<T> some(T value) {
         return new Some<>(value);
     }
 
+    @Contract(pure = true)
     @SuppressWarnings("unchecked")
     static <T> Option<T> none() {
         return (None<T>) None.INSTANCE;
@@ -61,7 +63,8 @@ public sealed interface Option<T> {
         @Contract(pure = true)
         @Override
         public @NotNull String toString() {
-            return "Some(" + value + ")";
+            final String valueString = String.valueOf(value);
+            return "Some(" + valueString + ')';
         }
     }
 
