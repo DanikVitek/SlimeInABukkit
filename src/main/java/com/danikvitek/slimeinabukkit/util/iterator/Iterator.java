@@ -98,12 +98,7 @@ public interface Iterator<T> extends java.util.Iterator<T> {
 
             @Override
             protected T getNext() {
-                final T result;
-                try {
-                    result = next.get();
-                } catch (NoSuchElementException e) {
-                    throw new NoSuchElementException("next() on empty iterator");
-                }
+                final T result = next.get();
                 next = Option.none();
                 return result;
             }
@@ -147,12 +142,7 @@ public interface Iterator<T> extends java.util.Iterator<T> {
 
             @Override
             protected U getNext() {
-                final U result;
-                try {
-                    result = next.get();
-                } catch (NoSuchElementException e) {
-                    throw new NoSuchElementException("next() on empty iterator");
-                }
+                final U result = next.get();
                 next = Option.none();
                 return result;
             }
