@@ -1,4 +1,4 @@
-package com.danikvitek.slimeinabukkit;
+package com.danikvitek.slimeinabukkit.util;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;

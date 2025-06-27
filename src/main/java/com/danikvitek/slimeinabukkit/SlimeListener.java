@@ -4,6 +4,7 @@ import com.danikvitek.slimeinabukkit.config.PluginConfig;
 import com.danikvitek.slimeinabukkit.persistence.PersistentContainerAccessor;
 import com.danikvitek.slimeinabukkit.util.ISUtil;
 import com.danikvitek.slimeinabukkit.util.Option;
+import com.danikvitek.slimeinabukkit.util.Scheduler;
 import com.danikvitek.slimeinabukkit.util.iterator.Indexed;
 import com.danikvitek.slimeinabukkit.util.iterator.Iterator;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
@@ -176,7 +177,7 @@ public class SlimeListener implements Listener {
         final Player player = event.getPlayer();
         if (checkCannotPickupSlime(player)) return;
 
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || player.isSneaking()) return;
         debugLog.accept("PlayerInteractEvent: Action = " + event.getAction());
 
         if (event.getHand() == EquipmentSlot.OFF_HAND &&

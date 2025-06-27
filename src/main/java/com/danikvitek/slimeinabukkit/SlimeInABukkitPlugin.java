@@ -6,6 +6,7 @@ import com.danikvitek.slimeinabukkit.config.ChunkMessageResolver;
 import com.danikvitek.slimeinabukkit.config.ConfigAccessor;
 import com.danikvitek.slimeinabukkit.config.PluginConfig;
 import com.danikvitek.slimeinabukkit.persistence.PersistentContainerAccessor;
+import com.danikvitek.slimeinabukkit.util.Scheduler;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

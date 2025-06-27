@@ -1,0 +1,16 @@
+[versions]
+annotations = "25.0.0"
+bstats = "3.0.2"
+
+shadow = "8.1.1"
+paperweight = "1.7.2"
+"run-paper" = "2.3.1"
+
+[libraries]
+jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
+bstats-bukkit = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
+
+[plugins]
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+runpaper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
