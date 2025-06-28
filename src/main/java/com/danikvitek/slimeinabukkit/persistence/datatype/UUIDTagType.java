@@ -24,7 +24,10 @@ public final class UUIDTagType implements PersistentDataType<byte[], UUID> {
     }
 
     @Override
-    public byte @NotNull [] toPrimitive(final @NotNull UUID complex, final @NotNull PersistentDataAdapterContext context) {
+    public byte @NotNull [] toPrimitive(
+        final @NotNull UUID complex,
+        final @NotNull PersistentDataAdapterContext context
+    ) {
         final ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
         bb.putLong(complex.getMostSignificantBits());
         bb.putLong(complex.getLeastSignificantBits());
@@ -32,10 +35,13 @@ public final class UUIDTagType implements PersistentDataType<byte[], UUID> {
     }
 
     @Override
-    public @NotNull UUID fromPrimitive(final byte @NotNull [] primitive, final @NotNull PersistentDataAdapterContext context) {
+    public @NotNull UUID fromPrimitive(
+        final byte @NotNull [] primitive,
+        final @NotNull PersistentDataAdapterContext context
+    ) {
         final ByteBuffer bb = ByteBuffer.wrap(primitive);
-        final long firstLong = bb.getLong();
-        final long secondLong = bb.getLong();
-        return new UUID(firstLong, secondLong);
+        final long mostSigBits = bb.getLong();
+        final long leastSigBits = bb.getLong();
+        return new UUID(mostSigBits, leastSigBits);
     }
 }

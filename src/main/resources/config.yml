@@ -1,13 +1,50 @@
+# Custom model data, used for Slime in a Bucket.
+# You can use these values in resource packs to display custom textures for slimes in buckets.
 custom-model-data:
+  # Default: 404
   calm-slime: 404
+  # Default: 200
   active-slime: 200
+
+# Title of the slime bucket item.
+# Default: <!italic><lang:item.slimeinabukkit.slime_bucket>
 bucket-title: <!italic><lang:item.slimeinabukkit.slime_bucket>
 
+# Message used in /slime_chunk command.
+# You can use the <chunk-status> placeholder in the message to display the status of the chunk.
+# Default: <gray>This chunk </gray><chunk-status><gray> a Slime chunk
 slime-chunk-message: <gray>This chunk </gray><chunk-status><gray> a Slime chunk
+
+# Messages used in /slime_chunk command with <chunk-status> placeholder.
 chunk-status:
+  # Default: <green>is
   'true': <green>is
+  # Default: <red>is not
   'false': <red>is not
 
+# Whether players can pick up slimes in buckets.
+# Default: true
 can-pickup-slime: true
 
+sound:
+  # Sound mode for slimes in buckets.
+  # Available modes: off, once, loop.
+  # Default: loop
+  mode: loop
+  animation:
+    # Animation frame time for slimes in buckets.
+    # Default: 2
+    frametime: 2
+    # List of animation frames for slimes in buckets.
+    # Each frame is a name of a sound to play. If the frame should not play a sound, use an empty string value.
+    # Default: [ENTITY_SLIME_JUMP_SMALL, '', '', '', ENTITY_SLIME_SQUISH_SMALL]
+    frames:
+      - ENTITY_SLIME_JUMP_SMALL
+      - ''
+      - ''
+      - ''
+      - ENTITY_SLIME_SQUISH_SMALL
+
+# Whether to enable debug logging.
+# Default: false
 debug: false

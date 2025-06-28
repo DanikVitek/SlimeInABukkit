@@ -1,32 +1,44 @@
 package com.danikvitek.slimeinabukkit.command;
 
 import com.danikvitek.slimeinabukkit.config.ChunkMessageResolver;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class SlimeChunkCommand implements CommandExecutor {
+import java.util.List;
+
+public class SlimeChunkCommand extends BukkitCommand {
     private final @NotNull ChunkMessageResolver messageResolver;
 
     public SlimeChunkCommand(@NotNull ChunkMessageResolver messageResolver) {
+        super(
+            "slime_chunk",
+            "Tells you, if the chunk you are in is a slime chunk",
+            "/slime_chunk",
+            List.of()
+        );
         this.messageResolver = messageResolver;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender,
-                             @NotNull Command command,
-                             @NotNull String s,
-                             @NotNull String[] strings) {
-        slimeChunkImpl(commandSender);
+    public boolean execute(
+        @NotNull CommandSender sender,
+        @NotNull String commandLabel,
+        @NotNull String[] args
+    ) {
+        slimeChunkImpl(sender);
         return true;
     }
 
     private void slimeChunkImpl(CommandSender sender) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatColor.RED + "Command can only be used by a player");
+            sender.sendMessage(Component.text(
+                "Command can only be used by a player",
+                NamedTextColor.RED
+            ));
             return;
         }
 

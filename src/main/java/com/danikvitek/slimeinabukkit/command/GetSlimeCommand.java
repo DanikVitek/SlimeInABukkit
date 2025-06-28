@@ -7,33 +7,42 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.danikvitek.slimeinabukkit.SlimeInABukkitPlugin.SLIME_BUCKET_MATERIAL;
 
-public class GetSlimeCommand implements CommandExecutor {
+public class GetSlimeCommand extends BukkitCommand {
     private final @NotNull PluginConfig config;
     private final @NotNull PersistentContainerAccessor persistentContainerAccessor;
 
-    public GetSlimeCommand(@NotNull PluginConfig config,
-                           @NotNull PersistentContainerAccessor persistentContainerAccessor) {
+    public GetSlimeCommand(
+        @NotNull PluginConfig config,
+        @NotNull PersistentContainerAccessor persistentContainerAccessor
+    ) {
+        super(
+            "get_slime",
+            "Gives a bucket of slime to the player",
+            "/get_slime",
+            List.of()
+        );
         this.config = config;
         this.persistentContainerAccessor = persistentContainerAccessor;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender,
-                             @NotNull Command command,
-                             @NotNull String label,
-                             @NotNull String[] args) {
+    public boolean execute(
+        @NotNull CommandSender sender,
+        @NotNull String commandLabel,
+        @NotNull String[] args
+    ) {
         getSlimeImpl(sender);
         return true;
     }
@@ -48,11 +57,8 @@ public class GetSlimeCommand implements CommandExecutor {
         final ItemMeta slimeBucketMeta = slimeBucket.getItemMeta();
         assert slimeBucketMeta != null;
         final Location location = player.getLocation();
-        slimeBucketMeta.setCustomModelData(
-            location.getChunk().isSlimeChunk()
-                ? config.getActiveSlimeCmd()
-                : config.getCalmSlimeCmd()
-        );
+        slimeBucketMeta.setCustomModelData(location.getChunk()
+            .isSlimeChunk() ? config.getActiveSlimeCmd() : config.getCalmSlimeCmd());
 
         slimeBucketMeta.displayName(config.getSlimeBucketTitle());
         persistentContainerAccessor.setSlimeBucketUUID(

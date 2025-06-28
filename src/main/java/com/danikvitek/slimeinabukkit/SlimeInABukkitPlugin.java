@@ -5,16 +5,17 @@ import com.danikvitek.slimeinabukkit.command.SlimeChunkCommand;
 import com.danikvitek.slimeinabukkit.config.ChunkMessageResolver;
 import com.danikvitek.slimeinabukkit.config.ConfigAccessor;
 import com.danikvitek.slimeinabukkit.config.PluginConfig;
+import com.danikvitek.slimeinabukkit.listener.SlimeListener;
 import com.danikvitek.slimeinabukkit.persistence.PersistentContainerAccessor;
 import com.danikvitek.slimeinabukkit.util.Scheduler;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
+import java.util.List;
+import java.util.Locale;
 
 public final class SlimeInABukkitPlugin extends JavaPlugin implements ConfigAccessor {
     public static final Material SLIME_BUCKET_MATERIAL = Material.SLIME_BALL;
@@ -29,28 +30,28 @@ public final class SlimeInABukkitPlugin extends JavaPlugin implements ConfigAcce
         this.saveDefaultConfig();
 
         final var persistentContainerAccessor = new PersistentContainerAccessor(new NamespacedKey(this, "slime-uuid"));
-
-        Objects.requireNonNull(getCommand("get_slime"))
-               .setExecutor(new GetSlimeCommand(pluginConfig, persistentContainerAccessor));
-
         final var messageResolver = new ChunkMessageResolver(
             pluginConfig.getSlimeChunkMessage(),
             pluginConfig.getChunkStatusTrue(),
             pluginConfig.getChunkStatusFalse()
         );
-        Objects.requireNonNull(getCommand("slime_chunk")).setExecutor(new SlimeChunkCommand(messageResolver));
+
+        getServer().getCommandMap()
+            .registerAll(
+                getName().toLowerCase(Locale.ROOT),
+                List.of(
+                    new GetSlimeCommand(pluginConfig, persistentContainerAccessor),
+                    new SlimeChunkCommand(messageResolver)
+                )
+            );
 
         new Metrics(this, PLUGIN_ID);
 
-        Bukkit.getPluginManager().registerEvents(
-            new SlimeListener(
-                pluginConfig,
-                this::debugLog,
-                scheduler,
-                persistentContainerAccessor
-            ),
-            this
-        );
+        getServer().getPluginManager()
+            .registerEvents(
+                new SlimeListener(pluginConfig, this::debugLog, scheduler, persistentContainerAccessor),
+                this
+            );
     }
 
     @Override

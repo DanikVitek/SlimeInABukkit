@@ -15,9 +15,11 @@ public class ChunkMessageResolver {
     private final @NotNull ComponentLike chunkStatusTrue;
     private final @NotNull ComponentLike chunkStatusFalse;
 
-    public ChunkMessageResolver(final @NotNull String message,
-                                final @NotNull ComponentLike chunkStatusTrue,
-                                final @NotNull ComponentLike chunkStatusFalse) {
+    public ChunkMessageResolver(
+        final @NotNull String message,
+        final @NotNull ComponentLike chunkStatusTrue,
+        final @NotNull ComponentLike chunkStatusFalse
+    ) {
         messageFactory = c -> MiniMessage.miniMessage().deserialize(
             message,
             Placeholder.component(CHUNK_STATUS_PLACEHOLDER, c)

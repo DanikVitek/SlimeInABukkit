@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.danikvitek"
-version = "2.2"
+version = "2.3"
 
 repositories {
     mavenCentral()
@@ -34,8 +34,21 @@ dependencies {
     implementation(libs.bstats.bukkit)
 }
 
+val targetJavaVersion = 17
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
+}
+tasks.withType(xyz.jpenilla.runtask.task.AbstractRun::class) {
+    javaLauncher = javaToolchains.launcherFor {
+        vendor = JvmVendorSpec.JETBRAINS
+        languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+    jvmArgs(
+        "-XX:+AllowEnhancedClassRedefinition",
+        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005",
+//        "-Dpaper.log-level=ALL",
+//        "-Dlog4j.configurationFile=log4j2.xml"
+    )
 }
 
 tasks {
@@ -50,13 +63,19 @@ tasks {
     }
     runServer {
         dependsOn(shadowJar)
+        minecraftVersion("1.18.2")
+        downloadPlugins {
+            modrinth("ViaVersion", "wMqhJcIA")
+            modrinth("LuckPerms", "ZPtLedoF")
+            modrinth("TabTPS", "DlhrDe98")
+        }
     }
     compileJava {
         options.encoding = Charsets.UTF_8.name() // We want UTF-8 for everything
 
         // Set the release flag. This configures what version bytecode the compiler will emit, as well as what JDK APIs are usable.
         // See https://openjdk.java.net/jeps/247 for more information.
-        options.release.set(17)
+        options.release.set(targetJavaVersion)
     }
     javadoc {
         options.encoding = Charsets.UTF_8.name() // We want UTF-8 for everything

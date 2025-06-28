@@ -1,6 +1,7 @@
 package com.danikvitek.slimeinabukkit.util;
 
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +27,14 @@ public class Scheduler {
 
     public void runTaskTimerAsynchronously(@NotNull Consumer<BukkitTask> task, long delay, long period) {
         bukkitScheduler.runTaskTimerAsynchronously(plugin, task, delay, period);
+    }
+
+    public BukkitTask runTaskTimerAsynchronously(@NotNull Runnable task, long delay, long period) {
+        return bukkitScheduler.runTaskTimerAsynchronously(plugin, task, delay, period);
+    }
+
+    public BukkitTask runTaskTimerAsynchronously(@NotNull BukkitRunnable task, long delay, long period) {
+        return task.runTaskTimerAsynchronously(plugin, delay, period);
     }
 
     public void cancelAll() {
