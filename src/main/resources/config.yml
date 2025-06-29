@@ -27,6 +27,12 @@ chunk-status:
 can-pickup-slime: true
 
 sound:
+  # Volume of the sound played by slimes in buckets.
+  # Default: 0.5
+  volume: 0.5
+  # Pitch of the sound played by slimes in buckets.
+  # Default: 1.0
+  pitch: 1.0
   # Sound mode for slimes in buckets.
   # Available modes: off, once, loop.
   # Default: loop

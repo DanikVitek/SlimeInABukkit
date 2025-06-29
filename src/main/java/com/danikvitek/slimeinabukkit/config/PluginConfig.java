@@ -72,12 +72,27 @@ public class PluginConfig {
     );
 
     private static final String SOUND_PATH = "sound";
+
     private static final String SOUND_MODE_PATH = SOUND_PATH + ".mode";
     private static final SoundMode SOUND_MODE_DEFAULT = SoundMode.LOOP;
     private static final List<String> SOUND_MODE_COMMENTS = List.of(
         "Sound mode for slimes in buckets.",
         "Available modes: off, once, loop.",
         "Default: " + SOUND_MODE_DEFAULT
+    );
+
+    private static final String SOUND_VOLUME_PATH = SOUND_PATH + ".volume";
+    private static final float SOUND_VOLUME_DEFAULT = .5f;
+    private static final List<String> SOUND_VOLUME_COMMENTS = List.of(
+        "Volume of the sound played by slimes in buckets.",
+        "Default: " + SOUND_VOLUME_DEFAULT
+    );
+
+    private static final String SOUND_PITCH_PATH = SOUND_PATH + ".pitch";
+    private static final float SOUND_PITCH_DEFAULT = 1f;
+    private static final List<String> SOUND_PITCH_COMMENTS = List.of(
+        "Pitch of the sound played by slimes in buckets.",
+        "Default: " + SOUND_PITCH_DEFAULT
     );
 
     private static final String ANIMATION_PATH = SOUND_PATH + ".animation";
@@ -116,6 +131,8 @@ public class PluginConfig {
     private Component chunkStatusFalse;
     private boolean canPickupSlime;
     private SoundMode soundMode;
+    private float soundVolume;
+    private float soundPitch;
     private int animationFrametime;
     private List<Optional<Sound>> animationFrames;
     private boolean debug;
@@ -140,6 +157,8 @@ public class PluginConfig {
             MINI_MESSAGE.deserialize(config.getString(CHUNK_STATUS_FALSE_PATH, CHUNK_STATUS_FALSE_DEFAULT));
         canPickupSlime = config.getBoolean(CAN_PICKUP_SLIME_PATH, CAN_PICKUP_SLIME_DEFAULT);
         soundMode = SoundMode.fromString(config.getString(SOUND_MODE_PATH, SOUND_MODE_DEFAULT.toString()));
+        soundVolume = (float) config.getDouble(SOUND_VOLUME_PATH, SOUND_VOLUME_DEFAULT);
+        soundPitch = (float) config.getDouble(SOUND_PITCH_PATH, SOUND_PITCH_DEFAULT);
         animationFrametime = config.getInt(ANIMATION_FRAMETIME_PATH, ANIMATION_FRAMETIME_DEFAULT);
         animationFrames = config.getStringList(ANIMATION_FRAMES_PATH).stream()
             .map(s -> s.isBlank() ? Optional.<Sound>empty() : Optional.of(Sound.valueOf(s)))
@@ -181,6 +200,12 @@ public class PluginConfig {
 
         config.set(SOUND_MODE_PATH, soundMode.toString());
         config.setComments(SOUND_MODE_PATH, SOUND_MODE_COMMENTS);
+
+        config.set(SOUND_VOLUME_PATH, (double) soundVolume);
+        config.setComments(SOUND_VOLUME_PATH, SOUND_VOLUME_COMMENTS);
+
+        config.set(SOUND_PITCH_PATH, (double) soundPitch);
+        config.setComments(SOUND_PITCH_PATH, SOUND_PITCH_COMMENTS);
 
         config.set(ANIMATION_FRAMETIME_PATH, animationFrametime);
         config.setComments(ANIMATION_FRAMETIME_PATH, ANIMATION_FRAMETIME_COMMENTS);
@@ -228,6 +253,14 @@ public class PluginConfig {
 
     public @NotNull SoundMode getSoundMode() {
         return soundMode;
+    }
+
+    public float getSoundVolume() {
+        return soundVolume;
+    }
+
+    public float getSoundPitch() {
+        return soundPitch;
     }
 
     public int getAnimationFrametime() {
