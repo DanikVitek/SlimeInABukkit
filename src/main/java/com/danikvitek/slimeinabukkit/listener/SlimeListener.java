@@ -162,8 +162,8 @@ public class SlimeListener implements Listener {
             Sound.sound(
                 sound,
                 Sound.Source.HOSTILE,
-                0.5f,
-                1f
+                config.getSoundVolume(),
+                config.getSoundPitch()
             ),
             soundEmitter
         );
